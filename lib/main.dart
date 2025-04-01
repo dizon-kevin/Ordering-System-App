@@ -237,5 +237,48 @@ void deleteItem(dynamic id) async {
       print("❌ Error deleting item: $e");
     }
   }
+@override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 500), getData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("Item List"),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: Icon(CupertinoIcons.add, color: CupertinoColors.activeGreen),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => AddProductPage(
+                      server: server,
+                      refreshItems: getData,
+                    ),
+                  ),
+                );
+                getData();
+              },
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: Icon(CupertinoIcons.cart, color: CupertinoColors.activeBlue),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (context) => CartPage(cart, purchaseItems)),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
 
 
