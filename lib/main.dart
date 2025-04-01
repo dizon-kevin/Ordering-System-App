@@ -133,3 +133,52 @@ class _HomepageState extends State<Homepage> {
                       print("❌ Invalid stock or price values");
                       return;
                     }
+
+                    Map<String, dynamic> requestData = {
+                      "id": item['id'], // Ensure ID is an integer
+                      "item_name": itemName,
+                      "stock": stockValue,
+                      "price": priceValue,
+                    };
+
+                    print("📤 Sending request: ${jsonEncode(requestData)}"); // Debugging
+
+                    try {
+                      final response = await http.post(
+                        Uri.parse("$server/update_item.php"),
+                        headers: {
+                          "Content-Type": "application/json", // Ensure JSON content type
+                          "Accept": "application/json", // Accept JSON response
+                        },
+                        body: jsonEncode(requestData),
+                      );
+
+                      print("🛠️ Response: ${response.body}"); // Debugging
+
+                      if (response.statusCode == 200) {
+                        setState(() {
+                          int index = items.indexWhere((element) => element['id'] == item['id']);
+                          if (index != -1) {
+                            items[index]['item_name'] = itemName;
+                            items[index]['stock'] = stockValue.toString();
+                            items[index]['price'] = priceValue.toString();
+                          }
+                        });
+
+                        Navigator.pop(context);
+                      } else {
+                        print("❌ Update failed: ${response.statusCode}");
+                      }
+                    } catch (e) {
+                      print("❌ Error updating item: $e");
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
