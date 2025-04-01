@@ -281,4 +281,44 @@ void deleteItem(dynamic id) async {
         ),
       ),
 
+ child: SafeArea(
+        child: isLoading
+            ? Center(child: CupertinoActivityIndicator())
+            : items.isEmpty
+            ? Center(child: Text("No items available"))
+            : ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, int index) {
+            final item = items[index];
+
+            return CupertinoListTile(
+              title: Text(item['item_name'] ?? "Unknown Item"),
+              subtitle: Text("Stock: ${item['stock']} | Price: ₱${item['price']}"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Icon(CupertinoIcons.add_circled, color: CupertinoColors.systemBlue),
+                    onPressed: () => addToCart(item),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Icon(CupertinoIcons.pencil, color: CupertinoColors.systemYellow),
+                    onPressed: () => updateItem(item),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Icon(CupertinoIcons.trash, color: CupertinoColors.systemRed),
+                    onPressed: () => deleteItem(item['id']),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
 
