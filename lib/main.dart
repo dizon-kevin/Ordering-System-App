@@ -322,3 +322,48 @@ void deleteItem(dynamic id) async {
   }
 }
 
+class CartPage extends StatelessWidget {
+  final List<Map<String, dynamic>> cart;
+  final Function purchaseItems;
+
+  const CartPage(this.cart, this.purchaseItems, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("Cart (${cart.length} items)"),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: cart.length,
+                itemBuilder: (context, int index) {
+                  final item = cart[index];
+                  return CupertinoListTile(
+                    title: Text(item['item_name'] ?? "Unknown Item"),
+                    subtitle: Text("Price: ₱${item['price'] ?? '0.00'}"),
+                  );
+                },
+              ),
+            ),
+            if (cart.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CupertinoButton.filled(
+                  child: Text("Purchase"),
+                  onPressed: () {
+                    purchaseItems();
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
