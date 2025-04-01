@@ -71,3 +71,65 @@ class _HomepageState extends State<Homepage> {
       print("❌ Error purchasing: $e");
     }
   }
+
+   void showSuccessDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text("Purchase Successful"),
+          content: Text("Your order has been placed successfully!"),
+          actions: [
+            CupertinoDialogAction(
+              child: Text("OK"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void updateItem(Map<String, dynamic> item) {
+    TextEditingController nameController = TextEditingController(text: item['item_name']);
+    TextEditingController stockController = TextEditingController(text: item['stock'].toString());
+    TextEditingController priceController = TextEditingController(text: item['price'].toString());
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return CupertinoAlertDialog(
+              title: Text("Update Item"),
+              content: Column(
+                children: [
+                  CupertinoTextField(controller: nameController, placeholder: "Item Name"),
+                  CupertinoTextField(controller: stockController, placeholder: "Stock", keyboardType: TextInputType.number),
+                  CupertinoTextField(controller: priceController, placeholder: "Price", keyboardType: TextInputType.number),
+                ],
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  child: Text("Cancel"),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CupertinoDialogAction(
+                  child: Text("Update"),
+                  onPressed: () async {
+                    String itemName = nameController.text.trim();
+                    String stock = stockController.text.trim();
+                    String price = priceController.text.trim();
+
+                    if (itemName.isEmpty || stock.isEmpty || price.isEmpty) {
+                      print("❌ All fields are required");
+                      return;
+                    }
+
+                    int? stockValue = int.tryParse(stock);
+                    double? priceValue = double.tryParse(price);
+
+                    if (stockValue == null || priceValue == null) {
+                      print("❌ Invalid stock or price values");
+                      return;
+                    }
