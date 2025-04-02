@@ -47,7 +47,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  void addToCart(Map<String, dynamic> item) {
+  void addToCart(Map<String, dynamic> item) async {
     TextEditingController quantityController = TextEditingController(text: '1');
 
     showCupertinoDialog(
@@ -71,10 +71,47 @@ class _HomepageState extends State<Homepage> {
             ),
             CupertinoDialogAction(
               child: Text("Add"),
-              onPressed: () {
+              onPressed: () async {
                 int? quantity = int.tryParse(quantityController.text.trim());
+
                 if (quantity == null || quantity <= 0) {
                   print("❌ Invalid quantity");
+                  return;
+                }
+
+                // Check if the item is out of stock
+                if (int.parse(item['stock'].toString()) <= 0) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: Text("Out of Stock"),
+                      content: Text("${item['item_name']} is out of stock."),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text("OK"),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+
+                // Check if the quantity exceeds the available stock
+                if (quantity > int.parse(item['stock'].toString())) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: Text("Insufficient Stock"),
+                      content: Text("Only ${item['stock']} items are available."),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text("OK"),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  );
                   return;
                 }
 
@@ -83,11 +120,12 @@ class _HomepageState extends State<Homepage> {
                     "id": item["id"],
                     "item_name": item["item_name"],
                     "price": item["price"],
-                    "quantity": quantity,  // Include quantity in the cart
+                    "quantity": quantity,
                   });
                 });
 
                 Navigator.pop(context);
+                print("✅ Item added to cart successfully.");
               },
             ),
           ],
@@ -95,6 +133,7 @@ class _HomepageState extends State<Homepage> {
       },
     );
   }
+
 
 
   Future<void> purchaseItems() async {
