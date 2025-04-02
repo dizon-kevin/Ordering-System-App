@@ -75,3 +75,33 @@ try {
     );
   }
 
+@override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("Add Product"),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              CupertinoTextField(controller: nameController, placeholder: "Item Name"),
+              SizedBox(height: 10),
+              CupertinoTextField(controller: priceController, placeholder: "Price", keyboardType: TextInputType.number),
+              SizedBox(height: 10),
+              CupertinoTextField(controller: stockController, placeholder: "Stock", keyboardType: TextInputType.number),
+              SizedBox(height: 20),
+              isLoading
+                  ? CupertinoActivityIndicator()
+                  : CupertinoButton.filled(
+                child: Text("Add Product"),
+                onPressed: addProduct,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
