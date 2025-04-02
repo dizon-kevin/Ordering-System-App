@@ -16,7 +16,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String server = "http://192.168.1.115/devops";
+  String server = "http://192.168.1.227/ordering";
   List<dynamic> items = [];
   List<Map<String, dynamic>> cart = [];
   bool isLoading = true;
@@ -48,33 +48,84 @@ class _HomepageState extends State<Homepage> {
   }
 
   void addToCart(Map<String, dynamic> item) {
-    setState(() {
-      cart.add(item);
-    });
+    TextEditingController quantityController = TextEditingController(text: '1');
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text("Add to Cart"),
+          content: Column(
+            children: [
+              Text("Enter Quantity:"),
+              CupertinoTextField(
+                controller: quantityController,
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: Text("Cancel"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            CupertinoDialogAction(
+              child: Text("Add"),
+              onPressed: () {
+                int? quantity = int.tryParse(quantityController.text.trim());
+                if (quantity == null || quantity <= 0) {
+                  print("❌ Invalid quantity");
+                  return;
+                }
+
+                setState(() {
+                  cart.add({
+                    "id": item["id"],
+                    "item_name": item["item_name"],
+                    "price": item["price"],
+                    "quantity": quantity,  // Include quantity in the cart
+                  });
+                });
+
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+
 
   Future<void> purchaseItems() async {
     try {
       final response = await http.post(
         Uri.parse("$server/purchase.php"),
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {"cart": jsonEncode(cart)},
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          cart.clear();
-          getData();
-        });
-        showSuccessDialog();
+        final responseData = jsonDecode(response.body);
+        if (responseData["message"] == "Purchase Successful") {
+          setState(() {
+            cart.clear();
+            getData();
+          });
+          showSuccessDialog();
+        } else {
+          print("❌ Purchase failed: ${responseData["message"]}");
+        }
       } else {
-        print("❌ Purchase failed: ${response.statusCode}");
+        print("❌ Purchase request failed with status: ${response.statusCode}");
       }
     } catch (e) {
       print("❌ Error purchasing: $e");
     }
   }
 
-   void showSuccessDialog() {
+
+  void showSuccessDialog() {
     showCupertinoDialog(
       context: context,
       builder: (context) {
@@ -236,7 +287,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-@override
+  @override
   void initState() {
     super.initState();
     Future.delayed(Duration(milliseconds: 500), getData);
@@ -280,7 +331,7 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
 
- child: SafeArea(
+      child: SafeArea(
         child: isLoading
             ? Center(child: CupertinoActivityIndicator())
             : items.isEmpty
@@ -343,7 +394,8 @@ class CartPage extends StatelessWidget {
                   final item = cart[index];
                   return CupertinoListTile(
                     title: Text(item['item_name'] ?? "Unknown Item"),
-                    subtitle: Text("Price: ₱${item['price'] ?? '0.00'}"),
+                    subtitle: Text("Price: ₱${item['price'] ?? '0.00'}" " | Quantity: ${item['quantity'] ?? '1'}"),
+
                   );
                 },
               ),
@@ -365,4 +417,3 @@ class CartPage extends StatelessWidget {
     );
   }
 }
-
