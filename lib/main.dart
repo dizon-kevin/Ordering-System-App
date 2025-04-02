@@ -331,12 +331,48 @@ class _HomepageState extends State<Homepage> {
     super.initState();
     Future.delayed(Duration(milliseconds: 500), getData);
   }
+  void showDevelopersDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text("Developers"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text("Cruz, John Eric"),
+              Text("Dizon, Kevin"),
+              Text("Juanatas, Cris Gabriel"),
+              Text("Luriz, Jenzelle"),
+              Text("Macapagal, Marc Lawrence"),
+              Text("Venasquez, Charles"),
+            ],
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text("Item List"),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(CupertinoIcons.settings, color: CupertinoColors.activeBlue),
+          onPressed: () {
+            showDevelopersDialog(context);
+          },
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
