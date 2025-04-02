@@ -137,25 +137,21 @@ class _HomepageState extends State<Homepage> {
                     }
 
                     Map<String, dynamic> requestData = {
-                      "id": item['id'], // Ensure ID is an integer
+                      "id": item['id'],
                       "item_name": itemName,
                       "stock": stockValue,
                       "price": priceValue,
                     };
 
-                    print("📤 Sending request: ${jsonEncode(requestData)}"); // Debugging
-
                     try {
                       final response = await http.post(
                         Uri.parse("$server/update_item.php"),
                         headers: {
-                          "Content-Type": "application/json", // Ensure JSON content type
-                          "Accept": "application/json", // Accept JSON response
+                          "Content-Type": "application/json",
+                          "Accept": "application/json",
                         },
                         body: jsonEncode(requestData),
                       );
-
-                      print("🛠️ Response: ${response.body}"); // Debugging
 
                       if (response.statusCode == 200) {
                         setState(() {
@@ -166,8 +162,8 @@ class _HomepageState extends State<Homepage> {
                             items[index]['price'] = priceValue.toString();
                           }
                         });
-
                         Navigator.pop(context);
+                        getData();  // Reload the data after update
                       } else {
                         print("❌ Update failed: ${response.statusCode}");
                       }
@@ -183,8 +179,9 @@ class _HomepageState extends State<Homepage> {
       },
     );
   }
-void deleteItem(dynamic id) async {
-    int itemId = int.tryParse(id.toString()) ?? 0; // Convert to int safely
+
+  void deleteItem(dynamic id) async {
+    int itemId = int.tryParse(id.toString()) ?? 0;
 
     if (itemId == 0) {
       print("❌ Invalid item ID");
@@ -211,16 +208,14 @@ void deleteItem(dynamic id) async {
       },
     );
 
-    if (!confirmDelete) return; // User canceled deletion
+    if (!confirmDelete) return;
 
     try {
       final response = await http.post(
         Uri.parse("$server/delete_item.php"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"id": itemId}), // Send integer ID
+        body: jsonEncode({"id": itemId}),
       );
-
-      print("🛠️ Delete Response: ${response.body}"); // Debugging output
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -228,6 +223,7 @@ void deleteItem(dynamic id) async {
           setState(() {
             items.removeWhere((item) => item['id'] == itemId);
           });
+          getData();  // Reload the data after deletion
           print("✅ Item deleted successfully");
         } else {
           print("❌ Error deleting item: ${responseData['error']}");
@@ -239,6 +235,7 @@ void deleteItem(dynamic id) async {
       print("❌ Error deleting item: $e");
     }
   }
+
 @override
   void initState() {
     super.initState();
