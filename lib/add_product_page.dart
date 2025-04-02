@@ -59,3 +59,19 @@ try {
     }
   }
 
+  void showErrorDialog(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text("Error"),
+        content: Text(message),
+        actions: [
+          CupertinoButton(
+            child: Text("OK"),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+
