@@ -31,9 +31,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file(System.getenv("CM_KEYSTORE_PATH"))
-            storePassword = System.getenv("CM_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("CM_KEY_ALIAS")
-            keyPassword = System.getenv("CM_KEY_PASSWORD")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
 
