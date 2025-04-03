@@ -16,7 +16,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String server = "http://orderingapp.shop/ordering/";
+  String server = "https://orderingapp.shop/ordering/";
   List<dynamic> items = [];
   List<Map<String, dynamic>> cart = [];
   bool isLoading = true;
